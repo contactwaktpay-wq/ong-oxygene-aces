@@ -23,7 +23,7 @@ fs.copyFileSync(path.join(ROOT, 'src/site.js'), path.join(OUT, 'assets/site.js')
 for (const [pkg, ws] of [['inter', [400, 500, 600, 700, 800]], ['fraunces', [700, 900]]])
   for (const w of ws) { const n = `${pkg}-latin-${w}-normal.woff2`; fs.copyFileSync(path.join(NM, `@fontsource/${pkg}/files`, n), path.join(OUT, 'assets/fonts', n)); }
 fs.cpSync(path.join(ROOT, 'images'), path.join(OUT, 'images'), { recursive: true });
-for (const f of ['_headers', 'robots.txt', '404.html']) if (fs.existsSync(path.join(ROOT, 'src', f))) fs.copyFileSync(path.join(ROOT, 'src', f), path.join(OUT, f));
+for (const f of ['_headers', 'robots.txt', '404.html', 'CNAME']) if (fs.existsSync(path.join(ROOT, 'src', f))) fs.copyFileSync(path.join(ROOT, 'src', f), path.join(OUT, f));
 // CSS : les polices sont référencées depuis assets/ (fonts/…)
 const css = fs.readFileSync(path.join(ROOT, 'src/input.css'), 'utf8').replace('"./index.html"', '"./.built.html"');
 fs.writeFileSync(path.join(ROOT, 'src/.input.css'), css);
