@@ -1,0 +1,4 @@
+# Site 100 % statique : aucun build sur Netlify (le dossier "docs" est déjà construit)
+[build]
+  publish = "docs"
+  command = ""
