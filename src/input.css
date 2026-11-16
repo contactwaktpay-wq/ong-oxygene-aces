@@ -59,3 +59,6 @@ body{font-family:var(--font-sans);background:var(--cream);color:var(--ink)}
 
 /* Basculer l'amélioration photo : ajouter la classe raw-photos sur <body> */
 body.raw-photos .photo-enhanced{filter:none}
+.gal-filter{transition:all .2s ease;cursor:pointer}
+.gal-filter:hover{border-color:var(--green);color:var(--green)}
+.gal-filter.active{background:var(--green);color:#fff;border-color:var(--green)}

@@ -36,21 +36,47 @@
     });
   });
 
-  // Visionneuse photo
-  var lb = $('#lightbox'), lbImg = $('#lbImg'), lbCap = $('#lbCap');
+  // Visionneuse photo (précédent / suivant, clavier, glissement)
+  var lb = $('#lightbox'), lbImg = $('#lbImg'), lbCap = $('#lbCap'), list = [], pos = 0;
+  function visible(el) { return el.offsetParent !== null; }
+  function show(i) {
+    pos = (i + list.length) % list.length; var c = list[pos];
+    lbImg.src = c.getAttribute('data-full'); lbImg.alt = c.getAttribute('data-cap') || '';
+    lbCap.textContent = (c.getAttribute('data-cap') || '') + (list.length > 1 ? '  (' + (pos + 1) + '/' + list.length + ')' : '');
+  }
+  function openLb(card) {
+    var scope = card.closest('#galGrid') ? $$('#galGrid .gal-card').filter(visible)
+              : card.closest('article') ? $$('.gal-card', card.closest('article')) : [card];
+    list = scope; show(Math.max(0, scope.indexOf(card)));
+    lb.classList.add('open'); document.body.style.overflow = 'hidden'; $('#lbClose').focus();
+  }
   function closeLb() { lb.classList.remove('open'); lbImg.src = ''; document.body.style.overflow = ''; }
-  $$('.gal-card').forEach(function (c) {
-    c.addEventListener('click', function () {
-      lbImg.src = c.getAttribute('data-full'); lbImg.alt = c.getAttribute('data-cap') || '';
-      lbCap.textContent = c.getAttribute('data-cap') || '';
-      lb.classList.add('open'); document.body.style.overflow = 'hidden'; $('#lbClose').focus();
-    });
-  });
+  $$('.gal-card').forEach(function (c) { c.addEventListener('click', function () { openLb(c); }); });
   if (lb) {
     $('#lbClose').addEventListener('click', closeLb);
+    $('#lbPrev').addEventListener('click', function (e) { e.stopPropagation(); show(pos - 1); });
+    $('#lbNext').addEventListener('click', function (e) { e.stopPropagation(); show(pos + 1); });
     lb.addEventListener('click', function (e) { if (e.target === lb) closeLb(); });
-    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && lb.classList.contains('open')) closeLb(); });
+    document.addEventListener('keydown', function (e) {
+      if (!lb.classList.contains('open')) return;
+      if (e.key === 'Escape') closeLb(); else if (e.key === 'ArrowLeft') show(pos - 1); else if (e.key === 'ArrowRight') show(pos + 1);
+    });
+    var x0 = null;
+    lb.addEventListener('touchstart', function (e) { x0 = e.touches[0].clientX; }, { passive: true });
+    lb.addEventListener('touchend', function (e) {
+      if (x0 === null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null;
+      if (Math.abs(dx) > 50) show(pos + (dx < 0 ? 1 : -1));
+    });
   }
+
+  // Filtres de la photothèque
+  $$('.gal-filter').forEach(function (b) {
+    b.addEventListener('click', function () {
+      $$('.gal-filter').forEach(function (x) { x.classList.remove('active'); });
+      b.classList.add('active'); var f = b.getAttribute('data-f');
+      $$('.gal-item').forEach(function (it) { it.style.display = (f === 'all' || it.getAttribute('data-cat') === f) ? '' : 'none'; });
+    });
+  });
 
   // Wilayas
   var chosenRegion = '';
